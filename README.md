@@ -58,11 +58,11 @@ client        | _string_ | yes          | Application client id       | "a:12e45
 
 In order to support integration with the Watson IoT environment we need an event feed that fires a trigger in the OpenWhisk environment when messages are received. This service connects to a particular MQTT topic and then invokes the triggers that are registered for a given topic. It has its own Cloudant database to persist the topic-to-trigger subscription information. You will need to initialize this database prior to using this service.
 
-### Bluemix Deployment
+### IBM Cloud Deployment
 
-This service can be hosted as a Cloud Foundry application. To deploy on IBM Bluemix:
+This service can be hosted as a Cloud Foundry application. To deploy on IBM Cloud:
 
-1. Create a Cloudant service on Bluemix, name it `cloudant-mqtt-watson` and create a database named `topic_listeners`.
+1. Create a [Cloudant service](https://console.bluemix.net/catalog/services/cloudant-nosql-db), name it `cloudant-mqtt-watson` and create a database named `topic_listeners`.
 
 2. Create a view for that Cloudant database, by creating a new design document with the following content. It provides a way to query for the subscriptions.
 
@@ -87,7 +87,11 @@ This service can be hosted as a Cloud Foundry application. To deploy on IBM Blue
   }
   ```
 
-3. Change to the `MqttWatsonEventProvider` directory.
+3. Clone this repository
+
+`git clone https://github.com/kkbankol-ibm/openwhisk-package-mqtt-watson`
+
+and change to the `MqttWatsonEventProvider` directory.
 
 4. Change the name and host fields as necessary in `manifest.yml`.
 
@@ -144,7 +148,9 @@ $WSK_CLI trigger create mqttMsgReceived \
 1. Create a new trigger, using the example above.
 
 2. Bind an action to the trigger via a "Rule"
+
 `bx wsk rule create mqttRule mqttMsgReceived translateText`
+
 <!-- 2. See the [`handler.js`](actions/handler.js) file that reacts to the trigger events with action code below:
 
   ```javascript
@@ -161,7 +167,7 @@ $WSK_CLI trigger create mqttMsgReceived \
 
 <!-- 3. Create the rule that associate the trigger and the action:  -->
 
-4. Post a message to the MQTT topic that triggers events you have subscribed to:
+3. Post a message to the MQTT topic that triggers events you have subscribed to:
 
   ```json
   {
@@ -173,7 +179,7 @@ $WSK_CLI trigger create mqttMsgReceived \
   }
   ```
 
-5. Verify the action was invoked by checking the Cloud Functions monitor or by running:
+4. Verify the action was invoked by checking the Cloud Functions monitor or by running:
   ```bash
   bx wsk activation poll
   ```
