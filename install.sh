@@ -30,7 +30,7 @@ AUTH_KEY="$2"
 WSK_CLI="$3"
 PROVIDER_ENDPOINT="$4"
 
-PACKAGE_HOME="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+export PACKAGE_HOME="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 echo $PACKAGE_HOME
 echo Installing Watson MQTT Package
 
@@ -46,7 +46,7 @@ $WSK_CLI \
 
 $WSK_CLI --apihost "$API_HOST" action create \
   --auth "$AUTH_KEY" \
-  mqtt-watson/feed-action $PACKAGE_HOME/feeds/feed-action.js \
+  mqtt-watson/feed-action "$PACKAGE_HOME/feeds/feed-action.js" \
   --annotation feed true \
   --annotation description "A feed action to register to Watson IoT MQTT events meeting user specified criteria" \
   --annotation parameters '[{"name": "url", "required": true, "bindTime": true, "description": "Watson MQTT host URL"}, {"name": "topic", "required": true, "bindTime": true, "description": "MQTT topic to subscribe to"}, {"name": "username", "required": true, "bindTime": true, "": "API key"}, {"name": "password", "required": true, "bindTime": true, "": "API token"}, {"name": "client", "required": true, "bindTime": true, "": "Application client id"}]' \
