@@ -97,7 +97,12 @@ This service can be hosted as a Cloud Foundry application. To deploy on IBM Blue
 
 ### Bluemix Installation
 
-First you need to install the `wsk` CLI, follow the instructions at <https://new-console.ng.bluemix.net/openwhisk/cli>
+First, the IBM Cloud CLI (`bx`) will need to be installed. This can be done by following the instructions at <https://new-console.ng.bluemix.net/openwhisk/cli>
+
+The bluemix plugin for `cloud-functions` will also need to be installed with
+```
+bx plugin install Cloud-Functions -r Bluemix
+```
 
 This step assumes you've already deployed the Event Provider application. If not, see the section above.
 
@@ -105,11 +110,11 @@ This step assumes you've already deployed the Event Provider application. If not
 
 Where:
 
-- **$AUTH_KEY** is the OpenWhisk authentication key (Run `wsk property get` to obtain it)
-- **$WSK_CLI** is the path of OpenWhisk command interface binary
-- **$PROVIDER_ENDPOINT** is the endpoint of the event provider service running as a Cloud Foundry application on Bluemix. It's a fully qualified URL including the path to the resource. i.e. <http://mqtt-watson-${random-word}.mybluemix.net/mqtt-watson>
+- **$AUTH_KEY** is the OpenWhisk authentication key (Run `bx wsk property get` to obtain it)
+- **$WSK_CLI** is the path of OpenWhisk command interface binary, which should be `bx wsk`
+- **$PROVIDER_ENDPOINT** is the endpoint of the event provider service running as a Cloud Foundry application on Bluemix. It's a fully qualified URL including the path to the resource. i.e. <http://mqtt-watson-${random-word}.mybluemix.net/mqtt-watson>. This url can be found by running `bx cf apps`
 
-To uninstall:
+To uninstall the feed, run:
 
 `./uninstall.sh openwhisk.ng.bluemix.net $AUTH_KEY $WSK_CLI`
 
@@ -143,7 +148,10 @@ $WSK_CLI trigger create mqttMsgReceived \
 
 1. Create a new trigger, using the example above.
 
-2. Bind an action to the trigger via a "Rule"
+2. Bind an action to the trigger via a "Rule":
+<!-- ```
+bx wsk rule create <RuleName> <TriggerName> <ActionName>
+``` -->
 `bx wsk rule create mqttRule mqttMsgReceived translateText`
 <!-- 2. See the [`handler.js`](actions/handler.js) file that reacts to the trigger events with action code below:
 
@@ -159,9 +167,7 @@ $WSK_CLI trigger create mqttMsgReceived \
 
   Upload the action: `$WSK_CLI action create handler actions/handler.js` -->
 
-<!-- 3. Create the rule that associate the trigger and the action:  -->
-
-4. Post a message to the MQTT topic that triggers events you have subscribed to:
+3. Post a message to the MQTT topic that triggers events you have subscribed to:
 
   ```json
   {
@@ -173,7 +179,7 @@ $WSK_CLI trigger create mqttMsgReceived \
   }
   ```
 
-5. Verify the action was invoked by checking the Cloud Functions monitor or by running:
+4. Verify the action was invoked by checking the Cloud Functions monitor or by running:
   ```bash
   bx wsk activation poll
   ```

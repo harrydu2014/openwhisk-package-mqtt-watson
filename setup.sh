@@ -23,7 +23,7 @@ wsk trigger create mqttMsgReceived \
   --param topic "iot-2/type/${IOT_DEVICE_TYPE}/id/${IOT_DEVICE_ID}/evt/fromClient/fmt/json" \
   --param url "ssl://${IOT_ORG}.messaging.internetofthings.ibmcloud.com:8883" \
   --param username "${IOT_API_KEY}" \
-  --param password "${IOT_APP_AUTH_TOKEN}" \
+  --param password "${IOT_AUTH_TOKEN}" \
   --param client "a:${IOT_ORG}:wskmqttsub_$(date +%s)"
 
 echo "Create rule to invoke action when MQTT messages are received"
