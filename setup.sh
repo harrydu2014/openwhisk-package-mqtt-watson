@@ -4,27 +4,32 @@ set -e
 # cf create-service
 #
 # bx target -s dev
-
+source ../serverless-language-translation/cfcreds.env
 cd MqttWatsonEventProvider/ && cf push
 # TODO, the mqtt-watson app doesn't receover well, the Cloudant Document with ID <uuid>/msgReceived has to be deleted before restarting/redeploying
 cd ..
-sleep 5
+sleep 10
 export provider_url="$(cf apps | grep mqtt-watson | awk '{print $6}' | tr -d ',' | xargs echo -n )"
+if [ "${provider_url}" == "" ] ; then
+  echo "provider_url not found, try again"
+  exit 1
+fi
 # Clean up / Deploy again
+# cf delete -f mqtt-watson
 # ./uninstall.sh openwhisk.ng.bluemix.net $(wsk property get --auth | awk '{print $3}') "wsk"
-# wsk trigger delete subscription-event-trigger
+# wsk trigger delete mqttMsgReceived
+# wsk rule delete mqttRule
+
 ./install.sh openwhisk.ng.bluemix.net "$(wsk property get --auth | awk '{print $3'})" "wsk" "http://${provider_url}/mqtt-watson"
 sleep 5
 echo "Create trigger that'll be invoked each time a message is received at given topic"
-# wsk trigger delete subscription-event-trigger
-# wsk package delete mqtt-watson
 wsk trigger create mqttMsgReceived \
   --feed mqtt-watson/feed-action \
   --param topic "iot-2/type/${IOT_DEVICE_TYPE}/id/${IOT_DEVICE_ID}/evt/fromClient/fmt/json" \
-  --param url "ssl://${IOT_ORG}.messaging.internetofthings.ibmcloud.com:8883" \
+  --param url "ssl://${IOT_ORG_ID}.messaging.internetofthings.ibmcloud.com:8883" \
   --param username "${IOT_API_KEY}" \
   --param password "${IOT_AUTH_TOKEN}" \
-  --param client "a:${IOT_ORG}:wskmqttsub_$(date +%s)"
+  --param client "a:${IOT_ORG_ID}:wskmqttsub_$(date +%s)"
 
 echo "Create rule to invoke action when MQTT messages are received"
 bx wsk rule create mqttRule mqttMsgReceived translateText
